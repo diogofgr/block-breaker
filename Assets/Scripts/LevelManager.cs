@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 public class LevelManager : MonoBehaviour {
 
 	public void LoadLevel(string name){
+		Brick.numberOfBreakableBricks = 0;
 		SceneManager.LoadScene(name);
 	}
 
@@ -16,6 +17,7 @@ public class LevelManager : MonoBehaviour {
 	}
 
 	public void LoadNextLevel(){
+		Brick.numberOfBreakableBricks = 0;
 		SceneManager.LoadScene (SceneManager.GetActiveScene().buildIndex + 1);
 	}
 }

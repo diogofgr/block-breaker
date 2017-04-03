@@ -5,6 +5,7 @@ using UnityEngine;
 public class Paddle : MonoBehaviour {
 
 	private Ball ball;
+	public bool autoPlay = false;
 	
 	public float mouseSensitivity = Mathf.Clamp(0.6f, 0f, 1f);
 	// Use this for initialization
@@ -15,20 +16,32 @@ public class Paddle : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		// this line is not even setting the initial paddle positio...
-		Vector3 paddlePos = new Vector3 (this.transform.position.x, this.transform.position.y, this.transform.position.z);
-		float mousePos = Input.mousePosition.x - 400;
-
-//		print ("initial paddle pos: " + paddlePos.x);
-//		print (mousePos);
-
-		paddlePos.x = Mathf.Clamp (mousePos * mouseSensitivity / 30, -6f, 6f);
-
-//		print ("new paddle pos: " + paddlePos.x);
-		this.transform.position = paddlePos;
+		if(autoPlay && Ball.ballLaunched){
+			FollowBall ();
+		}
+		else {
+			FollowMouse ();
+		}
 	}
 
 	void OnCollisionEnter2D(Collision2D other){
 		ball.canBoost = true;
+	}
+
+	void FollowMouse(){
+		Vector3 paddlePos = new Vector3 (this.transform.position.x, this.transform.position.y, this.transform.position.z);
+		float mousePos = Input.mousePosition.x - 400;
+
+		paddlePos.x = Mathf.Clamp (mousePos * mouseSensitivity / 30, -6f, 6f);			
+		this.transform.position = paddlePos;
+	}
+
+	void FollowBall(){
+		Vector3 paddlePos = new Vector3 (this.transform.position.x, this.transform.position.y, this.transform.position.z);
+		float ballPos = ball.transform.position.x;
+		paddlePos.x = ballPos;
+	
+		this.transform.position = new Vector3 (ballPos, this.transform.position.y, this.transform.position.z);
+
 	}
 }

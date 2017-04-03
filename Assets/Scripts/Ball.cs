@@ -8,9 +8,8 @@ public class Ball : MonoBehaviour {
 	private Vector3 ballToPaddleVector;
 	private Vector2 currentVelocity;
 
-	private bool ballLaunched;
+	public static bool ballLaunched;
 	public bool canBoost;
-	private float verticalBoost = 5f;
 
 	// Use this for initialization
 	void Start () {
@@ -34,14 +33,22 @@ public class Ball : MonoBehaviour {
 			} 
 		}
 		else {
-			// Give vertical canBoost when you click right mouse after the ball hits the paddle:
+			// Give VERTICAL BOOST when you click right mouse after the ball hits the paddle:
 			if(Input.GetMouseButtonDown(1) && canBoost){
 				canBoost = false;
 				currentVelocity = this.GetComponent<Rigidbody2D> ().velocity;
-				this.GetComponent<Rigidbody2D>().velocity = new Vector2(currentVelocity.x, currentVelocity.y + verticalBoost);
+				float verticalBoost = 3f;
+				float smallSideBoost = 0.15f;
+				this.GetComponent<Rigidbody2D>().velocity = new Vector2(currentVelocity.x + smallSideBoost, currentVelocity.y + verticalBoost);
 			} 
 		}
 		
+	}
+	void OnCollisionEnter2D(Collision2D other) {
+		if (ballLaunched){
+			GetComponent<AudioSource>().Play (); // play audio
+		}
+
 	}
 
 }

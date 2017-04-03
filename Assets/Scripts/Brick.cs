@@ -5,13 +5,25 @@ using UnityEngine;
 public class Brick : MonoBehaviour {
 
 	private LevelManager levelManager;
+	public static int numberOfBreakableBricks = 0;
 
-	public int maxHits;
 	private int timesHit;
+	//TODO: load hitSprites directly in the code, instead of the inspector.
 	public Sprite[] hitSprites;
+	public int maxHits = 1;
+	private bool isBreakable;
+
+	public AudioClip crack;
+
+	void Awake(){
+	}
 
 	// Use this for initialization
 	void Start () {
+		if (this.tag == "Breakable"){
+			isBreakable = true;
+			numberOfBreakableBricks ++;
+		}
 		timesHit = 0;
 		levelManager = Object.FindObjectOfType<LevelManager> ();
 		LoadNextSprite ();
@@ -20,31 +32,42 @@ public class Brick : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
+		// request next level, for development:
 		if(Input.GetMouseButtonDown(2)){
-			SimulateWin ();
+			WinLevel ();
 		}
 	}
 
 	void OnCollisionEnter2D(Collision2D other) {
-		timesHit++;
-		LoadNextSprite ();
-
-		// destroy after reaching the maximum hits the block can take:
-		if (timesHit >= maxHits){
-			Destroy (gameObject, 0.1f);
+		if (isBreakable){
+			timesHit++;
+			LoadNextSprite ();
+			HandleDestruction ();
 		}
 
 	}
 
 	void LoadNextSprite(){
 		int hitSpritesIndex = Mathf.Clamp (timesHit, 0, 2);
-		print ("sprite index: " + hitSpritesIndex);
 		this.GetComponent<SpriteRenderer>().sprite = hitSprites [hitSpritesIndex];
 	}
 
+
+	void HandleDestruction(){
+		// destroy after reaching the maximum hits the block can take:
+		bool isBreakable = (this.tag == "Breakable"); 
+		if ( (timesHit >= maxHits) && isBreakable ){
+			AudioSource.PlayClipAtPoint (crack, transform.position, 0.25f); // play destruction sound
+			Destroy (gameObject, 0.1f);
+			numberOfBreakableBricks--;
+			print ("bricks left :" + numberOfBreakableBricks);
+			if (numberOfBreakableBricks == 0){
+				WinLevel ();
+			}
+		}
+	}
 	// TODO: replace this method with the actual capability of winning a level
-	void SimulateWin(){
+	void WinLevel(){
 		levelManager.LoadNextLevel();
 	}
 }
