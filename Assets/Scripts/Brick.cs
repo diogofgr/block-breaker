@@ -14,6 +14,7 @@ public class Brick : MonoBehaviour {
 	private bool isBreakable;
 
 	public AudioClip crack;
+	public GameObject smoke;
 
 	void Awake(){
 	}
@@ -57,6 +58,7 @@ public class Brick : MonoBehaviour {
 		// destroy after reaching the maximum hits the block can take:
 		bool isBreakable = (this.tag == "Breakable"); 
 		if ( (timesHit >= maxHits) && isBreakable ){
+			PuffSmoke ();
 			AudioSource.PlayClipAtPoint (crack, transform.position, 0.25f); // play destruction sound
 			Destroy (gameObject, 0.1f);
 			numberOfBreakableBricks--;
@@ -65,6 +67,15 @@ public class Brick : MonoBehaviour {
 				WinLevel ();
 			}
 		}
+	}
+
+	void PuffSmoke(){
+		Vector3 brickPos = this.transform.position;
+		Color brickColor = this.GetComponent<SpriteRenderer> ().color;
+		GameObject smokePuff = Instantiate(smoke, brickPos, Quaternion.identity); // instantiate smoke before destroying
+		
+		// Next line says obsolete but I cannot solve the warning
+		smokePuff.GetComponent<ParticleSystem> ().startColor = brickColor;
 	}
 	// TODO: replace this method with the actual capability of winning a level
 	void WinLevel(){
